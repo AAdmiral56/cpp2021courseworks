@@ -18,6 +18,9 @@
     <ClCompile Include="coursework1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="coursework2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DateTime.h">
@@ -32,7 +35,7 @@
     <ClInclude Include="Items.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Tests.h">
+    <ClInclude Include="Functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

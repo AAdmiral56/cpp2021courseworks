@@ -142,13 +142,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="coursework1.cpp" />
+    <ClCompile Include="coursework2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DateTime.h" />
     <ClInclude Include="Headers.h" />
     <ClInclude Include="ICS0017DataSource.h" />
     <ClInclude Include="Items.h" />
-    <ClInclude Include="Tests.h" />
+    <ClInclude Include="Functions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
