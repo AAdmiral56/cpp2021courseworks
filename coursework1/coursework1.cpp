@@ -109,7 +109,7 @@ HEADER_D* add_header_d(HEADER_D* pList, ITEM4* item) {
 		return pList;
 	}
 
-	// exists
+	//if the item exists
 	for (HEADER_D* p = pList; p != nullptr && id1(item->pID) >= p->cBegin; p = p->pNext) {
 		if (id1(item->pID) == p->cBegin) {
 			add_header_a(p, item);
