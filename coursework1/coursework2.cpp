@@ -15,9 +15,7 @@ class DataStructure {
 public:
 	DataStructure(char* pFilename = nullptr) {
 
-		if (pFilename == nullptr) {
-			structure = nullptr;
-		}
+		if (pFilename == nullptr) { structure = nullptr; }
 		else {
 
 			ifstream input;
@@ -41,13 +39,9 @@ public:
 		}
 	}
 
-	~DataStructure() {
-		delete_header_d(this->structure);
-	}
+	~DataStructure() { delete_header_d(this->structure); }
 
-	DataStructure(const DataStructure& Original) {
-		copy_dataStructure(Original.structure);
-	}
+	DataStructure(const DataStructure& Original) { copy_dataStructure(Original.structure); }
 
 	int GetItemsNumber() {
 		int n = 0;
@@ -65,9 +59,7 @@ public:
 	}
 
 	ITEM4* GetItem(char* pID) {
-		if (pID == nullptr) {
-			return NULL;
-		}
+		if (pID == nullptr) { return NULL; }
 		find_IDs(pID);
 		for (HEADER_D* p = this->structure; p != nullptr && cBegin1 >= p->cBegin; p = p->pNext)
 			if (p->cBegin == cBegin1)
@@ -79,13 +71,9 @@ public:
 		return NULL;
 	}
 
-	void operator+=(ITEM4* item) {
-		add_header_d(item);
-	}
+	void operator+=(ITEM4* item) { add_header_d(item); }
 
-	void operator-=(char* pID) {
-		remove_item(pID);
-	}
+	void operator-=(char* pID) { remove_item(pID); }
 
 	DataStructure& operator=(const DataStructure& Right) {
 		delete_header_d(this->structure);
@@ -122,9 +110,7 @@ public:
 	}
 
 	void Write(char* pFilename) {
-		if (this->structure == nullptr) {
-			cout << "structure empty";
-		}
+		if (this->structure == nullptr) { cout << "structure empty"; }
 		ofstream output;
 		output.open(pFilename);
 		for (HEADER_D* p = this->structure; p; p = p->pNext)
@@ -153,9 +139,7 @@ private:
 	void find_IDs(char* name) {
 		cBegin1 = *name;
 		char* pName = name;
-		for (int i = 1; !isupper(*(pName + i)); i++) {
-			cBegin2 = *(pName + i + 1);
-		}
+		for (int i = 1; !isupper(*(pName + i)); i++) { cBegin2 = *(pName + i + 1); }
 	}
 	void delete_item(ITEM4* item) {
 		if (item->pNext != nullptr)
@@ -219,9 +203,7 @@ private:
 	}
 	void add_header_d(ITEM4* item) {
 
-		if (item == nullptr) {
-			return;
-		}
+		if (item == nullptr) { return; }
 
 		find_IDs(item->pID);
 		// exists
@@ -315,16 +297,10 @@ private:
 
 		ITEM4* ppp = (ITEM4*)pp->pItems;
 		for (ppp; ppp != nullptr; ppp = ppp->pNext) { // goes to the last item
-			if (ppp->pNext == nullptr) {
-				break;
-			}
+			if (ppp->pNext == nullptr) { break; }
 		}
-		if (ppp == nullptr) {
-			pp->pItems = item;
-		}
-		else {
-			ppp->pNext = item;
-		}
+		if (ppp == nullptr) { pp->pItems = item; }
+		else { ppp->pNext = item; }
 	}
 	bool validate_id(char* pID) {
 		if (pID == nullptr) {
@@ -358,9 +334,7 @@ private:
 	}
 	void remove_item(char* pID) {
 
-		if (!validate_id(pID)) {
-			return;
-		}
+		if (!validate_id(pID)) { return; }
 
 		find_IDs(pID);
 
@@ -444,9 +418,7 @@ int main()
 	cout << "\033[1;31m[Step 1-3]\033[0m" << endl;
 	DataStructure* pds = new DataStructure;
 
-	for (int i = 0; i < 10; i++) {
-		*pds += (ITEM4*)GetItem(4);
-	}
+	for (int i = 0; i < 10; i++) { *pds += (ITEM4*)GetItem(4); }
 
 	cout << *pds << endl << endl;
 
@@ -459,9 +431,7 @@ int main()
 
 	cout << "\033[1;31m[Step 6]\033[0m" << endl;
 	ITEM4* XX = pds->GetItem((char*)"X X");
-	if (XX == NULL) {
-		cout << "Item doesn't exist" << endl << endl;
-	}
+	if (XX == NULL) { cout << "Item doesn't exist" << endl << endl; }
 
 	cout << "\033[1;31m[Step 7]\033[0m" << endl;
 	DataStructure* copy = new DataStructure(*pds);
