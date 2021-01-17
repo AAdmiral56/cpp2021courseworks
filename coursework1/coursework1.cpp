@@ -21,404 +21,282 @@
 #include <io.h>
 #include <iostream>
 
+using namespace std;
+
 void PrintDataStructure(HEADER_D*);
-HEADER_D* FillInAllItems(HEADER_D*, char* pNewItemID);
-HEADER_D* InsertItem(HEADER_D* pStruct, char* pNewItemID = 0);
-HEADER_D* RemoveItem(HEADER_D* pStruct, char* pItemID) {
-	printf("Removing");
-	return pStruct;
-}
-int cti(char c) {
-	if (isupper(c)) {
-		return (int)c - 65;
-	}
-	return -1;
-}
+char id1(char*);
+char id2(char*);
+HEADER_D* InsertItem(HEADER_D*, char*);
+HEADER_D* add_header_d(HEADER_D*, ITEM4*);
+void add_header_a(HEADER_D*, ITEM4*);
+void add_item(HEADER_A*, ITEM4*);
+HEADER_D* RemoveItem(HEADER_D*, char*);
+HEADER_D* remove_header_a(HEADER_A*, HEADER_D*, char, HEADER_D*);
+HEADER_D* remove_header_d(HEADER_D*, HEADER_D*);
 
 int main()
 {
-    HEADER_D* pList = GetStruct4(4, 10);
-    ITEM4* pToItems = (ITEM4*)GetItem(4);
-    char str[] = "M C";
-    char* ID = str;
-    PrintDataStructure(pList);
-    return 0;
-	const char* str[13] = { "Z A", "Z Z", "Z K", "A Z", "A A", "A K", "G Z", "G A", "G K", "M A", "M Ba", "M Bb", "M Z" };
+	HEADER_D* p = GetStruct4(4, 30);
+	const char* testcase[13] = { "Z A", "Z Z", "Z K", "A Z", "A A", "A K", "G Z", "G A", "G K", "M A", "M Ba", "M Bb", "M Z" };
 
+	cout << "Create Initial structure" << endl;
+	PrintDataStructure(p);
+	cout << endl;
 
+	cout << "Add items" << endl;
 	for (int i = 0; i < 13; i++) {
-		pList = InsertItem(pList, (char*)str[i]);
-	}
-	PrintDataStructure(pList);
-
-	printf("--------------------\n");
-
-	for (int i = 0; i < 13; i++) {
-		RemoveItem(pList, (char*)str[i]);
+		p = InsertItem(p, (char*)testcase[i]);
 	}
 
-	PrintDataStructure(pList);
+	PrintDataStructure(p);
+	cout << endl;
 
-	
+	cout << "Remove items" << endl;
+	for (int i = 0; i < 13; i++) {
+		p = RemoveItem(p, (char*)testcase[i]);
+	}
+	PrintDataStructure(p);
+
 	return 0;
 }
 
+char id1(char* name) {
+	return *name;
+}
+char id2(char* name) {
 
-void PrintDataStructure(HEADER_D* pList)
-{
-    if (!pList) // check input
-        return; // errors
-    int counter1 = 1;
-    headerD* pToPlacehVariable;
-    for (pToPlacehVariable = pList; pToPlacehVariable; pToPlacehVariable = pToPlacehVariable->pNext)
-    {
-		HEADER_A* AnotherV;
-		for (AnotherV = pToPlacehVariable->pHeaderA;AnotherV;AnotherV = AnotherV->pNext)
-		{
-			ITEM4* itemsV;
-			for (itemsV = (ITEM4*)(AnotherV->pItems); itemsV; itemsV = itemsV->pNext)
-			{
-				printf("%d)%s %lu %s\n", counter1, itemsV->pID, itemsV->Code, itemsV->pDate);
-				counter1++;
-			}
+	char* pName = name;
+	char c = ' ';
+	for (int i = 1; !isupper(*(pName + i)); i++) {
+		c = *(pName + i + 1);
+	}
+	return c;
+}
 
+void PrintDataStructure(HEADER_D* structure) {
+
+	int n = 1;
+	for (HEADER_D* p = structure; p; p = p->pNext)
+		for (HEADER_A* pp = p->pHeaderA; pp; pp = pp->pNext)
+			for (ITEM4* i = (ITEM4*)(pp->pItems); i; i = i->pNext, n++)
+				cout << n << ')' << i->pID << ' ' << i->Code << ' ' << i->pDate << endl;
+}
+
+HEADER_D* InsertItem(HEADER_D* pList, char* pID = 0) {
+
+	if (pList == nullptr) {
+		return pList;
+	}
+
+	ITEM4* item;
+
+	if (pID == nullptr) {
+		item = (ITEM4*)GetItem(4);
+		return add_header_d(pList, item);
+	}
+	else if (!isupper(*pID) || !isupper(*(pID + 2)) || *(pID + 1) != ' ' || *(pID + 3) != '\0') {
+		cout << "item " << pID << " is invalid!" << endl;
+		return pList;
+	}
+
+	item = (ITEM4*)GetItem(4, pID);
+	return add_header_d(pList, item);
+}
+
+HEADER_D* add_header_d(HEADER_D* pList, ITEM4* item) {
+
+	if (item == nullptr) {
+		return pList;
+	}
+
+	// exists
+	for (HEADER_D* p = pList; p != nullptr && id1(item->pID) >= p->cBegin; p = p->pNext) {
+		if (id1(item->pID) == p->cBegin) {
+			add_header_a(p, item);
+			return pList;
 		}
 	}
-	return;
-}
-HEADER_D* FillInAllItems(HEADER_D* pList, char* pNewItemID)
-{
-	if (!pList) 
-	{ //check if pList is empty
-		printf("Empty parameters");
+	// does not
+	HEADER_D* hd = new headerD();
+	hd->cBegin = id1(item->pID);
+	if (pList == nullptr) { //first only
+		hd->pNext = pList;
+		pList = hd;
+		add_header_a(hd, item);
+		return pList;
+	}
+	else if (id1(item->pID) < pList->cBegin) { // just first
+		hd->pNext = pList;
+		pList->pPrior = hd;
+		pList = hd;
+		add_header_a(hd, item);
 		return pList;
 	}
 
-	char ID1{}, ID2{};
-	if (pNewItemID == 0)
-	{
+	HEADER_D* p = pList;
+	for (p; p != nullptr && id1(item->pID) > p->cBegin; p = p->pNext) { // if item in last
+		if (p->pNext == nullptr) {
+			hd->pPrior = p;
+			p->pNext = hd;
+			add_header_a(hd, item);
+			return pList;
+		}
 	}
-	else if (isupper(*pNewItemID) && isspace(*(pNewItemID + 1)) && isupper(*(pNewItemID + 2)) && '\0' == *(pNewItemID + 3))
-	{ //if everything is ok
-		ID1 = *(pNewItemID);
-		ID2 = *(pNewItemID + 2);
+	// append to middle 
+	hd->pPrior = p->pPrior;
+	hd->pNext = p;
+	p->pPrior->pNext = hd;
+	p->pPrior = hd;
+	add_header_a(hd, item);
+	return pList;
+}
+
+void add_header_a(HEADER_D* p, ITEM4* item) {
+
+	for (HEADER_A* pp = p->pHeaderA; pp != nullptr && id2(item->pID) >= pp->cBegin; pp = pp->pNext) {
+		if (id2(item->pID) == pp->cBegin) {
+			add_item(pp, item);
+			return;
+		}
 	}
-	else //if pList is for smth different
-	{
-		printf("Wrong Format");
-		return pList;
+	// does not
+	HEADER_A* ha = new headerA(); //create new header
+	ha->cBegin = id2(item->pID);
+	if (p->pHeaderA == nullptr) { //first only
+		ha->pNext = p->pHeaderA;
+		p->pHeaderA = ha;
+		add_item(ha, item);
+		return;
 	}
-    HEADER_D* p;
-	bool jump = false;
-	for (p = pList;p;p = p->pNext)
-	{
-		if (p->pNext == nullptr || p->pNext->cBegin > ID1)
-		{
+	else if (id2(item->pID) < p->pHeaderA->cBegin) { // just first
+		HEADER_A* temp = p->pHeaderA;
+		ha->pNext = temp;
+		p->pHeaderA = ha;
+		add_item(ha, item);
+		return;
+	}
+
+	HEADER_A* pp = p->pHeaderA;
+	HEADER_A* prevpp = pp;
+	for (pp; pp != nullptr && id2(item->pID) > pp->cBegin; pp = pp->pNext) { //add to end
+		if (pp->pNext == nullptr) {
+			pp->pNext = ha;
+			add_item(ha, item);
+			return;
+		}
+		prevpp = pp;
+	}
+	// add to middle
+	ha->pNext = pp;
+	prevpp->pNext = ha;
+	add_item(ha, item);
+}
+
+void add_item(HEADER_A* pp, ITEM4* item) {
+
+	for (ITEM4* ppp = (ITEM4*)pp->pItems; ppp != nullptr; ppp = ppp->pNext) {
+		if (!strcmp(ppp->pID, item->pID)) {
+			cout << "Item " << item->pID << " already exists!" << endl;
+			return;
+		}
+	}
+
+	ITEM4* ppp = (ITEM4*)pp->pItems;
+	for (ppp; ppp != nullptr; ppp = ppp->pNext) { // goes to the last item
+		if (ppp->pNext == nullptr) {
 			break;
 		}
-		jump = true;
+	}
+	if (ppp == nullptr) {
+		pp->pItems = item;
+	}
+	else {
+		ppp->pNext = item;
+	}
+}
+
+HEADER_D* RemoveItem(HEADER_D* pList, char* pID) {
+
+	if (!isupper(*pID) || !isupper(*(pID + 2)) || *(pID + 1) != ' ' || *(pID + 3) != '\0') {
+		return pList;
 	}
 
-	if (p->cBegin == ID1)
-	{ //It exsists
-		//printf("1");
-		printf("%c\n", p->cBegin);
+	HEADER_D* p = pList;
+	for (p; p != nullptr && p->cBegin <= id1(pID); p = p->pNext) {
+		if (id1(pID) == p->cBegin) {
+			HEADER_A* pp, * prevpp = p->pHeaderA;
+			for (pp = p->pHeaderA; pp != nullptr && pp->cBegin <= id2(pID); pp = pp->pNext) {
+				if (id2(pID) == pp->cBegin) {
+					ITEM4* ppp, * prevppp = (ITEM4*)pp->pItems;
+					for (ppp = (ITEM4*)pp->pItems; ppp != nullptr; ppp = ppp->pNext) {
+						if (!strcmp(ppp->pID, pID)) {
 
-		HEADER_A* pp;
-		bool jump2 = false;
-		for (pp = p->pHeaderA;pp;pp = pp->pNext)
-		{
-			if (pp->pNext == nullptr || pp->pNext->cBegin > ID2)
-			{
-				break;
-			}
-			jump2 = true; //may be need to put before if statment
-		}
+							ITEM4* comp = (ITEM4*)pp->pItems; //first item to compare 
+							if (ppp->pID == comp->pID && ppp->pNext == nullptr) { //only item
+								return remove_header_a(prevpp, p, id2(pID), pList);
+							}
+							else if (ppp->pID == comp->pID) { //remove first
+								pp->pItems = ppp->pNext;
+							}
+							else if (ppp->pNext == nullptr) { //last 
+								prevppp->pNext = nullptr;
+							}
+							else {
+								prevppp->pNext = ppp->pNext;
+							}
+							delete ppp->pID;
+							delete ppp->pDate;
+							delete ppp;
+							return pList;
+						}
 
-		if (pp->cBegin == ID2)
-		{ //11 case
+						prevppp = ppp;
+					}
+				}
 
-			ITEM4* i = (ITEM4*)(pp->pItems);
-			ITEM4* pNewItem = (ITEM4*)GetItem(9, pNewItemID);
-			pNewItem->pNext = i;
-			pp->pItems = pNewItem;
-		}
-
-		else 
-		{ //10 case
-			if (!jump2 && pp->cBegin > ID2) 
-			{ //if its first
-				printf("FIRST!");
-				HEADER_A* newHeader_A = new headerA();
-				newHeader_A->cBegin = ID2;
-				newHeader_A->pItems = (ITEM4*)GetItem(9, pNewItemID);
-				newHeader_A->pNext = pp;
-				p->pHeaderA = newHeader_A;
-
-			}
-			else
-			{ //if not
-				HEADER_A* newHeader_A = new headerA();
-				newHeader_A->cBegin = ID2;
-				newHeader_A->pItems = (ITEM4*)GetItem(9, pNewItemID);
-				newHeader_A->pNext = pp->pNext;
-				pp->pNext = newHeader_A;
-
+				prevpp = pp;
 			}
 		}
 	}
 
-	else { //00 case
+	cout << "Item " << pID << " doesn't exist" << endl;
+	return pList;
+}
 
-		HEADER_A* newHeader_A = new headerA();
-		newHeader_A->cBegin = ID2;
-		newHeader_A->pItems = (ITEM4*)GetItem(9, pNewItemID);
-		newHeader_A->pNext = nullptr;
-
-		HEADER_D* newHeader_D = new headerD();
-		newHeader_D->cBegin = ID1;
-		newHeader_D->pHeaderA = newHeader_A;
-
-		if (!jump && p->cBegin > ID1) 
-		{ //if first
-
-			newHeader_D->pNext = pList;
-			pList = newHeader_D;
-		}
-		else
-		{
-			newHeader_D->pNext = p->pNext;
-			p->pNext = newHeader_D;
-		}
+HEADER_D* remove_header_a(HEADER_A* prevpp, HEADER_D* p, char C, HEADER_D* pList) {
+	if (prevpp == p->pHeaderA && prevpp->pNext == nullptr) {// remove header d if only
+		delete prevpp;
+		return remove_header_d(p, pList);
+	}
+	else if (prevpp == p->pHeaderA && prevpp->cBegin == C) { // remove first
+		p->pHeaderA = prevpp->pNext;
+		delete prevpp;
+	}
+	else {
+		// remove any other item 
+		HEADER_A* remove = prevpp->pNext;
+		prevpp->pNext = remove->pNext;
+		delete remove;
 	}
 
 	return pList;
-
 }
 
-
-
-HEADER_D* InsertItem(HEADER_D* pStruct, char* pNewItemID) {
-	if (!pStruct) {
-		//throw("Invalid pointer\n");
-		printf("Invalid pointer\n");
-		return pStruct;
+HEADER_D* remove_header_d(HEADER_D* p, HEADER_D* pList) {
+	if (p == pList) { // first item 
+		pList = p->pNext;
+		delete p;
 	}
-
-	char ID1, ID2;
-	ITEM4* pNewItemBuffer;
-
-	if (pNewItemID == 0) {//if no ID specified
-		pNewItemBuffer = (ITEM4*)GetItem(4);
-		ID1 = *pNewItemBuffer->pID;
-		char* buffer;
-		for (buffer = pNewItemBuffer->pID; !isspace(*buffer); *buffer++);
-		ID2 = *(buffer + 1);
-	}
-
-	else if (sizeof(pNewItemID) == 10)
-	{
-		printf_s("size is correct");
-		ID1 = *(pNewItemID), ID2 = rand() % 9999999999 + 1111111111;
-		if(ID1 == ID2)
-		{
-			printf_s("That one in a million chance has come up when the IDs are the same. Regenerating ID");
-		  ID2 = rand() % 9999999999 + 1111111111;
-		}
-	}
-	/*else if (isupper(*pNewItemID) && //ID specified and correct
-		isspace(*(pNewItemID + 1)) &&
-		isupper(*(pNewItemID + 2)) &&
-		'\0' == *(pNewItemID + 3)) {
-		ID1 = *(pNewItemID), ID2 = *(pNewItemID + 2);
-		pNewItemBuffer = (ITEM4*)GetItem(4, pNewItemID);
-	}
-	*/
-	else { //ID specified and wrong
-		printf("Identifier \"%s\" is in Wrong Format\n", pNewItemID);
-		return pStruct;
-	}
-
-	HEADER_D* p;
-	bool jump = false;
-	for (p = pStruct; p; p = p->pNext) {
-		if (p->pNext == nullptr || p->pNext->cBegin > ID1) {
-			break;
-		}
-		jump = true;
-	}
-
-	std::string ss;
-	//std::stringstream ss;
-	std::cout << "my_struct has " << boost::pfr::tuple_size<HEADER_D>::value << " fields: " << boost::pfr::io()<< "\n";
-
-	/*if (p->cBegin == ID1) { //Checking IDs
-		int pp = cti(ID2);
-		HEADER_D p;
-		ITEM4* cycle;
-		for(cycle = (ITEM4*)(HEADER_D::pPrior->pHeaderA[pp]);  < length; ++)
-		{
-
-		} */
-	/*
-		ITEM4* cycle;
-		for (cycle = (ITEM4*)(p->pHeaderA[pp]); cycle; cycle = cycle->pNext)
-		{
-			if (!strcmp(cycle->pID, pNewItemBuffer->pID)) {
-				//throw("Item already exists\n");
-				printf("\"%s\" already exsists\n", pNewItemBuffer->pID);
-				return pStruct;
-			}
-		}
-
-		ITEM4* ppp = (ITEM4*)GetItem(4, pNewItemID);
-		ppp->pNext = (ITEM4*)p->*cBegin[pp];
-		p->*pItems[pp] = ppp;
-		printf("Item added: %s\n", ppp->pID);
-		return pStruct;
-		*/
-	}
-	else { //00
-			   //printf("not found");
-		HEADER_D* newHeader_D = new headerD();
-		ITEM4** ptr = (ITEM4**)calloc(26, sizeof(ITEM4*));
-		newHeader_D->cBegin = ID1;
-		int pp;
-		for (pp = 0; pp < cti(ID2); pp++);
-		ptr[pp] = pNewItemBuffer;
-
-		//newHeader_D->pNext = *ptr;
-
-		if (!jump && p->cBegin > ID1) { //its first
-			newHeader_D->pNext = pStruct;
-			pStruct = newHeader_D;
-		}
-		else {//its not
-			newHeader_D->pNext = p->pNext;
-			p->pNext = newHeader_D;
-		}
-
-		return pStruct;
-	}
-}
-
-/*
-HEADER_D* RemoveItem(HEADER_D* pStruct, char* pItemID) {
-	printf("Removing");
-	return pStruct;
-}
-	//printf("Item to delete: %s\n", pItemID);
-	
-	if (!pStruct) {
-		//throw("Invalid pointer\n");
-		printf("Invalid pointer\n");
-		return pStruct;
-	}
-
-	if (!pItemID) {
-		//throw("Invalid pointer\n");
-		printf("Invalid item id\n");
-		return pStruct;
-	}
-
-	char ID1;
-	char ID2;
-	ITEM3* pItemDelete;
-
-
-	char* secondWord = strchr(pItemID, ' ');
-	if (isupper(*pItemID) && (secondWord != NULL) && isupper(secondWord[1])) {
-		ID1 = *(pItemID), ID2 = secondWord[1];
-	}
-	else
-	{ //ID specified and wrong
-			   //throw("IIdentifier has a Wrong Format\n");
-		printf("Identifier \"%s\" is in Wrong Format\n", pItemID);
-		return pStruct;
-	}
-
-	HEADER_A* pHeader = pStruct;
-	//for (; pHeader && pHeader->cBegin != ID1; pHeader = pHeader->pNext);
-
-	do
-	{
-		if (!pHeader) break;
-		if (pHeader->cBegin == ID1)
-		{
-			break;
-		}
-
-		pHeader = pHeader->pNext;
-
-	} while (true);
-
-	if (!pHeader) {
-		//throw("IIdentifier has a Wrong Format\n");
-		printf("No ID found\n");
-		return pStruct;
-	}
-
-	ITEM3* pList = (ITEM3*)pHeader->headerA::pItems[ID2 - 'A'];
-	if (!pList) {
-		//throw("No ID found\n");
-		printf("No ID found\n");
-		return pHeader;
-	}
-	ITEM3* pItem = pList; //(ITEM3*)pHeader->ppItems[ID2]
-	ITEM3* pItemBefore = pList; //(ITEM3*)pHeader->ppItems[ID2]
-
-	//for (; pItem && strcmp(pItem->pID, pItemID); pItemBefore = pItem, pItem = pItem->pNext){}
-
-	do
-	{
-		if (!pItem) break;
-		if (strcmp(pItem->pID, pItemID) == 0)
-		{
-			break;
-		}
-
-		pItemBefore = pItem;
-		pItem = pItem->pNext;
-
-	} while (true);
-
-
-	if (!pItem) {
-		//throw("No ID found\n");
-		printf("No ID found\n");
-		return pStruct;
-	}
-
-	if (pItem == pItemBefore) {
-
-		pHeader->headerA::pItems[ID2 - 'A'] = 0;
+	else if (p->pNext == nullptr) { //last item
+		p->pPrior->pNext = nullptr;
+		delete p;
 	}
 	else {
-		pItemBefore->pNext = pItem->pNext;
+		// 
+		p->pPrior->pNext = p->pNext;
+		p->pNext->pPrior = p->pPrior;
+		delete p;
 	}
 
-	free(pItem);
-
-	if (pHeader->headerA::pItems == 0)
-	{
-		if (pHeader->headerD::pPrior) {
-			pHeader->pPrior->pNext = pHeader->pNext;
-		}
-		else {
-			pHeader->pNext->pPrior = NULL;
-			pStruct = pHeader->pNext;
-		}
-		if (pHeader->pNext) {
-			pHeader->pNext->pPrior = pHeader->pPrior;
-		}
-		else {
-			pHeader->pPrior->pNext = NULL;
-		}
-		free(pHeader->headerA::pItems);
-		free(pHeader);
-	}
-
-	return pStruct;
-
-	
-*/
+	return pList;
+}
