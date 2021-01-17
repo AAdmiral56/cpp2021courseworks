@@ -148,6 +148,7 @@
     <ClInclude Include="Headers.h" />
     <ClInclude Include="ICS0017DataSource.h" />
     <ClInclude Include="Items.h" />
+    <ClInclude Include="Tests.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

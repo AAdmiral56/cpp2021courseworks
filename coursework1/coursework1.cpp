@@ -20,6 +20,7 @@
 #include "boost/pfr.hpp"
 #include <io.h>
 #include <iostream>
+#include "Tests.h"
 
 using namespace std;
 
@@ -60,9 +61,7 @@ int main()
 	return 0;
 }
 
-char id1(char* name) {
-	return *name;
-}
+char id1(char* name) { return *name; }
 char id2(char* name) {
 
 	char* pName = name;
