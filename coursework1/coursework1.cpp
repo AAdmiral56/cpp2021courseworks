@@ -76,8 +76,8 @@ void PrintDataStructure(HEADER_D* structure) {
 
 	int n = 1;
 	for (HEADER_D* pStructInfo = structure; pStructInfo; pStructInfo = pStructInfo->pNext)
-		for (HEADER_A* pp = pStructInfo->pHeaderA; pp; pp = pp->pNext)
-			for (ITEM4* i = (ITEM4*)(pp->pItems); i; i = i->pNext, n++)
+		for (HEADER_A* ppHeaderStuff = pStructInfo->pHeaderA; ppHeaderStuff; ppHeaderStuff = ppHeaderStuff->pNext)
+			for (ITEM4* i = (ITEM4*)(ppHeaderStuff->pItems); i; i = i->pNext, n++)
 				cout << n << ')' << i->pID << ' ' << i->Code << ' ' << i->pDate << endl;
 }
 
@@ -152,9 +152,9 @@ HEADER_D* add_header_d(HEADER_D* pList, ITEM4* item) {
 
 void add_header_a(HEADER_D* pStructInfo, ITEM4* item) {
 
-	for (HEADER_A* pp = pStructInfo->pHeaderA; pp != nullptr && id2(item->pID) >= pp->cBegin; pp = pp->pNext) {
-		if (id2(item->pID) == pp->cBegin) {
-			add_item(pp, item);
+	for (HEADER_A* ppHeaderStuff = pStructInfo->pHeaderA; ppHeaderStuff != nullptr && id2(item->pID) >= ppHeaderStuff->cBegin; ppHeaderStuff = ppHeaderStuff->pNext) {
+		if (id2(item->pID) == ppHeaderStuff->cBegin) {
+			add_item(ppHeaderStuff, item);
 			return;
 		}
 	}
@@ -175,39 +175,39 @@ void add_header_a(HEADER_D* pStructInfo, ITEM4* item) {
 		return;
 	}
 
-	HEADER_A* pp = pStructInfo->pHeaderA;
-	HEADER_A* prevpp = pp;
-	for (pp; pp != nullptr && id2(item->pID) > pp->cBegin; pp = pp->pNext) { //add to end
-		if (pp->pNext == nullptr) {
-			pp->pNext = ha;
+	HEADER_A* ppHeaderStuff = pStructInfo->pHeaderA;
+	HEADER_A* prevpp = ppHeaderStuff;
+	for (ppHeaderStuff; ppHeaderStuff != nullptr && id2(item->pID) > ppHeaderStuff->cBegin; ppHeaderStuff = ppHeaderStuff->pNext) { //add to end
+		if (ppHeaderStuff->pNext == nullptr) {
+			ppHeaderStuff->pNext = ha;
 			add_item(ha, item);
 			return;
 		}
-		prevpp = pp;
+		prevpp = ppHeaderStuff;
 	}
 	// add to middle
-	ha->pNext = pp;
+	ha->pNext = ppHeaderStuff;
 	prevpp->pNext = ha;
 	add_item(ha, item);
 }
 
-void add_item(HEADER_A* pp, ITEM4* item) {
+void add_item(HEADER_A* ppHeaderStuff, ITEM4* item) {
 
-	for (ITEM4* ppp = (ITEM4*)pp->pItems; ppp != nullptr; ppp = ppp->pNext) {
+	for (ITEM4* ppp = (ITEM4*)ppHeaderStuff->pItems; ppp != nullptr; ppp = ppp->pNext) {
 		if (!strcmp(ppp->pID, item->pID)) {
 			cout << "Item " << item->pID << " already exists!" << endl;
 			return;
 		}
 	}
 
-	ITEM4* ppp = (ITEM4*)pp->pItems;
+	ITEM4* ppp = (ITEM4*)ppHeaderStuff->pItems;
 	for (ppp; ppp != nullptr; ppp = ppp->pNext) { // goes to the last item
 		if (ppp->pNext == nullptr) {
 			break;
 		}
 	}
 	if (ppp == nullptr) {
-		pp->pItems = item;
+		ppHeaderStuff->pItems = item;
 	}
 	else {
 		ppp->pNext = item;
@@ -223,19 +223,19 @@ HEADER_D* RemoveItem(HEADER_D* pList, char* pID) {
 	HEADER_D* pStructInfo = pList;
 	for (pStructInfo; pStructInfo != nullptr && pStructInfo->cBegin <= id1(pID); pStructInfo = pStructInfo->pNext) {
 		if (id1(pID) == pStructInfo->cBegin) {
-			HEADER_A* pp, * prevpp = pStructInfo->pHeaderA;
-			for (pp = pStructInfo->pHeaderA; pp != nullptr && pp->cBegin <= id2(pID); pp = pp->pNext) {
-				if (id2(pID) == pp->cBegin) {
-					ITEM4* ppp, * prevppp = (ITEM4*)pp->pItems;
-					for (ppp = (ITEM4*)pp->pItems; ppp != nullptr; ppp = ppp->pNext) {
+			HEADER_A* ppHeaderStuff, * prevpp = pStructInfo->pHeaderA;
+			for (ppHeaderStuff = pStructInfo->pHeaderA; ppHeaderStuff != nullptr && ppHeaderStuff->cBegin <= id2(pID); ppHeaderStuff = ppHeaderStuff->pNext) {
+				if (id2(pID) == ppHeaderStuff->cBegin) {
+					ITEM4* ppp, * prevppp = (ITEM4*)ppHeaderStuff->pItems;
+					for (ppp = (ITEM4*)ppHeaderStuff->pItems; ppp != nullptr; ppp = ppp->pNext) {
 						if (!strcmp(ppp->pID, pID)) {
 
-							ITEM4* comp = (ITEM4*)pp->pItems; //first item to compare 
+							ITEM4* comp = (ITEM4*)ppHeaderStuff->pItems; //first item to compare 
 							if (ppp->pID == comp->pID && ppp->pNext == nullptr) { //only item
 								return remove_header_a(prevpp, pStructInfo, id2(pID), pList);
 							}
 							else if (ppp->pID == comp->pID) { //remove first
-								pp->pItems = ppp->pNext;
+								ppHeaderStuff->pItems = ppp->pNext;
 							}
 							else if (ppp->pNext == nullptr) { //last 
 								prevppp->pNext = nullptr;
@@ -253,7 +253,7 @@ HEADER_D* RemoveItem(HEADER_D* pList, char* pID) {
 					}
 				}
 
-				prevpp = pp;
+				prevpp = ppHeaderStuff;
 			}
 		}
 	}
