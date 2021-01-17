@@ -23,7 +23,6 @@
 #include "Functions.h"
 
 using namespace std;
-
 void PrintDataStructure(HEADER_D*);
 char id1(char*);
 char id2(char*);
@@ -75,10 +74,16 @@ char id2(char* name) {
 void PrintDataStructure(HEADER_D* structure) {
 
 	int n = 1;
-	for (HEADER_D* pStructInfo = structure; pStructInfo; pStructInfo = pStructInfo->pNext)
-		for (HEADER_A* ppHeaderStuff = pStructInfo->pHeaderA; ppHeaderStuff; ppHeaderStuff = ppHeaderStuff->pNext)
-			for (ITEM4* i = (ITEM4*)(ppHeaderStuff->pItems); i; i = i->pNext, n++)
-				cout << n << ')' << i->pID << ' ' << i->Code << ' ' << i->pDate << endl;
+	for (HEADER_D* pStructInfo = structure; pStructInfo; pStructInfo = pStructInfo->pNext) 
+	{
+	for (HEADER_A* ppHeaderStuff = pStructInfo->pHeaderA; ppHeaderStuff; ppHeaderStuff = ppHeaderStuff->pNext) 
+	    {
+	for (ITEM4* i = (ITEM4*)(ppHeaderStuff->pItems); i; i = i->pNext, n++) 
+	        {
+	cout << n << ')' << i->pID << ' ' << i->Code << ' ' << i->pDate << endl;
+			}
+		}
+	}
 }
 
 HEADER_D* InsertItem(HEADER_D* pList, char* pID = 0) {
