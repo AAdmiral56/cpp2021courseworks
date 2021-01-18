@@ -36,6 +36,7 @@ HEADER_D* remove_header_d(HEADER_D*, HEADER_D*);
 
 int main()
 {
+	system("Color 1A");
 	HEADER_D* pStructInfo = GetStruct4(4, 30);
 	const char* testcase[13] = { "Z A", "Z Z", "Z K", "A Z", "A A", "A K", "G Z", "G A", "G K", "M A", "M Ba", "M Bb", "M Z" };
 
@@ -178,7 +179,7 @@ void add_header_a(HEADER_D* pStructInfo, ITEM4* item) {
 	}
 
 	HEADER_A* ppHeaderStuff = pStructInfo->pHeaderA;
-	HEADER_A* prevpp = ppHeaderStuff;
+	HEADER_A* linePrev = ppHeaderStuff;
 	for (ppHeaderStuff; ppHeaderStuff != nullptr && id2(item->pID) > ppHeaderStuff->cBegin; ppHeaderStuff = ppHeaderStuff->pNext) { //Append the set to the end
 		if (ppHeaderStuff->pNext == nullptr) 
 		{
@@ -186,34 +187,34 @@ void add_header_a(HEADER_D* pStructInfo, ITEM4* item) {
 			add_item(headerAmember, item);
 			return;
 		}
-		prevpp = ppHeaderStuff;
+		linePrev = ppHeaderStuff;
 	}
 	// Append to middle
 	headerAmember->pNext = ppHeaderStuff;
-	prevpp->pNext = headerAmember;
+	linePrev->pNext = headerAmember;
 	add_item(headerAmember, item);
 }
 
 void add_item(HEADER_A* ppHeaderStuff, ITEM4* item) 
 {
 
-	for (ITEM4* ppp = (ITEM4*)ppHeaderStuff->pItems; ppp != nullptr; ppp = ppp->pNext) 
+	for (ITEM4* otheHeaderVar3 = (ITEM4*)ppHeaderStuff->pItems; otheHeaderVar3 != nullptr; otheHeaderVar3 = otheHeaderVar3->pNext)
 	{
-		if (!strcmp(ppp->pID, item->pID)) 
+		if (!strcmp(otheHeaderVar3->pID, item->pID))
 		{
 			cout << "Item " << item->pID << " already exists!" << endl;
 			return;
 		}
 	}
 
-	ITEM4* ppp = (ITEM4*)ppHeaderStuff->pItems;
-	for (ppp; ppp != nullptr; ppp = ppp->pNext) { // Break off adding items on the last one possible
-		if (ppp->pNext == nullptr) {
+	ITEM4* otheHeaderVar3 = (ITEM4*)ppHeaderStuff->pItems;
+	for (otheHeaderVar3; otheHeaderVar3 != nullptr; otheHeaderVar3 = otheHeaderVar3->pNext) { // Break off adding items on the last one possible
+		if (otheHeaderVar3->pNext == nullptr) {
 			break;
 		}
 	}
-	if (ppp == nullptr) { ppHeaderStuff->pItems = item; }
-	else { ppp->pNext = item; }
+	if (otheHeaderVar3 == nullptr) { ppHeaderStuff->pItems = item; }
+	else { otheHeaderVar3->pNext = item; }
 }
 
 HEADER_D* RemoveItem(HEADER_D* pList, char* pID) {
@@ -226,23 +227,23 @@ HEADER_D* RemoveItem(HEADER_D* pList, char* pID) {
 			HEADER_A* ppHeaderStuff, * prevpp = pStructInfo->pHeaderA;
 			for (ppHeaderStuff = pStructInfo->pHeaderA; ppHeaderStuff != nullptr && ppHeaderStuff->cBegin <= id2(pID); ppHeaderStuff = ppHeaderStuff->pNext) {
 				if (id2(pID) == ppHeaderStuff->cBegin) {
-					ITEM4* ppp, * prevppp = (ITEM4*)ppHeaderStuff->pItems;
-					for (ppp = (ITEM4*)ppHeaderStuff->pItems; ppp != nullptr; ppp = ppp->pNext) {
-						if (!strcmp(ppp->pID, pID))  //strcmp checks for differences in these IDs. Since we want them to be identical, we put the '!' there
+					ITEM4* otheHeaderVar3, * prevppp = (ITEM4*)ppHeaderStuff->pItems;
+					for (otheHeaderVar3 = (ITEM4*)ppHeaderStuff->pItems; otheHeaderVar3 != nullptr; otheHeaderVar3 = otheHeaderVar3->pNext) {
+						if (!strcmp(otheHeaderVar3->pID, pID))  //strcmp checks for differences in these IDs. Since we want them to be identical, we put the '!' there
 						{
 
 							ITEM4* comp = (ITEM4*)ppHeaderStuff->pItems; //first item to compare 
-							if (ppp->pID == comp->pID && ppp->pNext == nullptr) { return remove_header_a(prevpp, pStructInfo, id2(pID), pList); } //remove the entire header of pNext is a null pointer
-							else if (ppp->pID == comp->pID) { ppHeaderStuff->pItems = ppp->pNext;} 
-							else if (ppp->pNext == nullptr) { prevppp->pNext = nullptr;}
-							else { prevppp->pNext = ppp->pNext; }
-							delete ppp->pID;
-							delete ppp->pDate;
-							delete ppp;
+							if (otheHeaderVar3->pID == comp->pID && otheHeaderVar3->pNext == nullptr) { return remove_header_a(prevpp, pStructInfo, id2(pID), pList); } //remove the entire header of pNext is a null pointer
+							else if (otheHeaderVar3->pID == comp->pID) { ppHeaderStuff->pItems = otheHeaderVar3->pNext;}
+							else if (otheHeaderVar3->pNext == nullptr) { prevppp->pNext = nullptr;}
+							else { prevppp->pNext = otheHeaderVar3->pNext; }
+							delete otheHeaderVar3->pID;
+							delete otheHeaderVar3->pDate;
+							delete otheHeaderVar3;
 							return pList;
 						}
 
-						prevppp = ppp;
+						prevppp = otheHeaderVar3;
 					}
 				}
 
