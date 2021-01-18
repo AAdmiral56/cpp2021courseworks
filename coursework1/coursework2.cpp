@@ -11,11 +11,11 @@
 
 using namespace std;
 
-class DataStructure {
+class DataStructure {      //now doing smth similar to what we did in Java
 public:
 	DataStructure(char* pFilename = nullptr) {
 
-		if (pFilename == nullptr) { structure = nullptr; }
+		if (pFilename == nullptr) { structure = nullptr; } //if the file is gone, so is the structure
 		else {
 
 			ifstream input;
@@ -45,11 +45,11 @@ public:
 
 	int GetItemsNumber() {
 		int n = 0;
-		HEADER_D* p; // auxiliary variable
-		for (p = this->structure; p; p = p->pNext) {
+		HEADER_D* headerVariable; // auxiliary variable
+		for (headerVariable = this->structure; headerVariable; headerVariable = headerVariable->pNext) {
 
 			HEADER_A* pp;
-			for (pp = p->pHeaderA; pp; pp = pp->pNext) {
+			for (pp = headerVariable->pHeaderA; pp; pp = pp->pNext) {
 
 				ITEM4* i;
 				for (i = (ITEM4*)(pp->pItems); i; i = i->pNext, n++);
@@ -61,9 +61,9 @@ public:
 	ITEM4* GetItem(char* pID) {
 		if (pID == nullptr) { return NULL; }
 		find_IDs(pID);
-		for (HEADER_D* p = this->structure; p != nullptr && cBegin1 >= p->cBegin; p = p->pNext)
-			if (p->cBegin == cBegin1)
-				for (HEADER_A* pp = p->pHeaderA; pp != nullptr && cBegin2 >= pp->cBegin; pp = pp->pNext)
+		for (HEADER_D* headerVariable = this->structure; headerVariable != nullptr && cBegin1 >= headerVariable->cBegin; headerVariable = headerVariable->pNext)
+			if (headerVariable->cBegin == cBegin1)
+				for (HEADER_A* pp = headerVariable->pHeaderA; pp != nullptr && cBegin2 >= pp->cBegin; pp = pp->pNext)
 					if (pp->cBegin == cBegin2)
 						for (ITEM4* ppp = (ITEM4*)pp->pItems; ppp != nullptr; ppp = ppp->pNext)
 							if (!strcmp(ppp->pID, pID)) return ppp;
@@ -87,12 +87,12 @@ public:
 		else if (this->structure == nullptr && Other.structure != nullptr)
 			return 0;
 		//goes though double loop for header D then A and then item if number of entities is different they are not equal
-		for (HEADER_D* p = this->structure, *op = Other.structure;
-			p != nullptr && op != nullptr;
-			p = p->pNext, op = op->pNext) {
-			if (p == nullptr || op == nullptr) return 0;
+		for (HEADER_D* headerVariable = this->structure, *op = Other.structure;
+			headerVariable != nullptr && op != nullptr;
+			headerVariable = headerVariable->pNext, op = op->pNext) {
+			if (headerVariable == nullptr || op == nullptr) return 0;
 
-			for (HEADER_A* pp = p->pHeaderA, *opp = op->pHeaderA;
+			for (HEADER_A* pp = headerVariable->pHeaderA, *opp = op->pHeaderA;
 				pp || opp;
 				pp = pp->pNext, opp = opp->pNext) {
 				if (pp == nullptr || opp == nullptr) return 0;
@@ -113,8 +113,8 @@ public:
 		if (this->structure == nullptr) { cout << "structure empty"; }
 		ofstream output;
 		output.open(pFilename);
-		for (HEADER_D* p = this->structure; p; p = p->pNext)
-			for (HEADER_A* pp = p->pHeaderA; pp; pp = pp->pNext)
+		for (HEADER_D* headerVariable = this->structure; headerVariable; headerVariable = headerVariable->pNext)
+			for (HEADER_A* pp = headerVariable->pHeaderA; pp; pp = pp->pNext)
 				for (ITEM4* i = (ITEM4*)(pp->pItems); i; i = i->pNext)
 					output << i->pID << ' ' << i->Code << ' ' << i->pDate << endl;
 		output.close();
@@ -123,8 +123,8 @@ public:
 	friend ostream& operator<<(ostream& ostr, const DataStructure& str) {
 
 		int n = 1;
-		for (HEADER_D* p = str.structure; p; p = p->pNext)
-			for (HEADER_A* pp = p->pHeaderA; pp; pp = pp->pNext)
+		for (HEADER_D* headerVariable = str.structure; headerVariable; headerVariable = headerVariable->pNext)
+			for (HEADER_A* pp = headerVariable->pHeaderA; pp; pp = pp->pNext)
 				for (ITEM4* i = (ITEM4*)(pp->pItems); i; i = i->pNext, n++)
 					ostr << n << ')' << i->pID << ' ' << i->Code << ' ' << i->pDate << '\n';
 
@@ -154,30 +154,30 @@ private:
 		delete_item((ITEM4*)pp->pItems);
 		delete pp;
 	}
-	void delete_header_d(HEADER_D* p) {
-		if (p->pNext != nullptr)
-			delete_header_d(p->pNext);
+	void delete_header_d(HEADER_D* headerVariable) {
+		if (headerVariable->pNext != nullptr)
+			delete_header_d(headerVariable->pNext);
 
-		delete_header_a(p->pHeaderA);
-		delete p;
+		delete_header_a(headerVariable->pHeaderA);
+		delete headerVariable;
 	}
 	void copy_dataStructure(HEADER_D* Original) {
 		this->structure = new headerD();
 		HEADER_D* curPrev = nullptr;
 		HEADER_D* curp = this->structure;
-		for (HEADER_D* p = Original; p != nullptr; p = p->pNext) {
+		for (HEADER_D* headerVariable = Original; headerVariable != nullptr; headerVariable = headerVariable->pNext) {
 			curp->pPrior = curPrev;
 			curPrev = curp;
-			curp->cBegin = p->cBegin;
+			curp->cBegin = headerVariable->cBegin;
 			curp->pHeaderA = new headerA();
 			HEADER_A* curpp = curp->pHeaderA;
-			if (p->pNext != nullptr) {
+			if (headerVariable->pNext != nullptr) {
 				HEADER_D* curpNext = new headerD();
 				curp->pNext = curpNext;
 				curp = curpNext;
 			}
 
-			for (HEADER_A* pp = p->pHeaderA; pp != nullptr; pp = pp->pNext) {
+			for (HEADER_A* pp = headerVariable->pHeaderA; pp != nullptr; pp = pp->pNext) {
 				curpp->cBegin = pp->cBegin;
 				curpp->pItems = new ITEM4();
 				ITEM4* curppp = (ITEM4*)curpp->pItems;
@@ -207,9 +207,9 @@ private:
 
 		find_IDs(item->pID);
 		// exists
-		for (HEADER_D* p = this->structure; p != nullptr && cBegin1 >= p->cBegin; p = p->pNext) {
-			if (cBegin1 == p->cBegin) {
-				add_header_a(p, item);
+		for (HEADER_D* headerVariable = this->structure; headerVariable != nullptr && cBegin1 >= headerVariable->cBegin; headerVariable = headerVariable->pNext) {
+			if (cBegin1 == headerVariable->cBegin) {
+				add_header_a(headerVariable, item);
 				return;
 			}
 		}
@@ -230,25 +230,24 @@ private:
 			return;
 		}
 
-		HEADER_D* p = this->structure;
-		for (p; p != nullptr && cBegin1 > p->cBegin; p = p->pNext) { // if item in last
-			if (p->pNext == nullptr) {
-				hd->pPrior = p;
-				p->pNext = hd;
+		HEADER_D* headerVariable = this->structure;
+		for (headerVariable; headerVariable != nullptr && cBegin1 > headerVariable->cBegin; headerVariable = headerVariable->pNext) { // if item in last
+			if (headerVariable->pNext == nullptr) {
+				hd->pPrior = headerVariable;
+				headerVariable->pNext = hd;
 				add_header_a(hd, item);
 				return;
 			}
 		}
-		// append to middle 
-		hd->pPrior = p->pPrior;
-		hd->pNext = p;
-		p->pPrior->pNext = hd;
-		p->pPrior = hd;
+		hd->pPrior = headerVariable->pPrior;
+		hd->pNext = headerVariable;
+		headerVariable->pPrior->pNext = hd;
+		headerVariable->pPrior = hd;
 		add_header_a(hd, item);
 	}
-	void add_header_a(HEADER_D* p, ITEM4* item) {
+	void add_header_a(HEADER_D* headerVariable, ITEM4* item) {
 
-		for (HEADER_A* pp = p->pHeaderA; pp != nullptr && cBegin2 >= pp->cBegin; pp = pp->pNext) {
+		for (HEADER_A* pp = headerVariable->pHeaderA; pp != nullptr && cBegin2 >= pp->cBegin; pp = pp->pNext) {
 			if (cBegin2 == pp->cBegin) {
 				add_item(pp, item);
 				return;
@@ -257,21 +256,21 @@ private:
 		// does not
 		HEADER_A* ha = new headerA(); //create new header
 		ha->cBegin = cBegin2;
-		if (p->pHeaderA == nullptr) { //first only
-			ha->pNext = p->pHeaderA;
-			p->pHeaderA = ha;
+		if (headerVariable->pHeaderA == nullptr) { //first only
+			ha->pNext = headerVariable->pHeaderA;
+			headerVariable->pHeaderA = ha;
 			add_item(ha, item);
 			return;
 		}
-		else if (cBegin2 < p->pHeaderA->cBegin) { // just first
-			HEADER_A* temp = p->pHeaderA;
+		else if (cBegin2 < headerVariable->pHeaderA->cBegin) { // just first
+			HEADER_A* temp = headerVariable->pHeaderA;
 			ha->pNext = temp;
-			p->pHeaderA = ha;
+			headerVariable->pHeaderA = ha;
 			add_item(ha, item);
 			return;
 		}
 
-		HEADER_A* pp = p->pHeaderA;
+		HEADER_A* pp = headerVariable->pHeaderA;
 		HEADER_A* prevpp = pp;
 		for (pp; pp != nullptr && cBegin2 > pp->cBegin; pp = pp->pNext) { //add to end
 			if (pp->pNext == nullptr) {
@@ -338,11 +337,11 @@ private:
 
 		find_IDs(pID);
 
-		HEADER_D* p = this->structure;
-		for (p; p != nullptr && p->cBegin <= cBegin1; p = p->pNext) {
-			if (cBegin1 == p->cBegin) {
-				HEADER_A* pp, * prevpp = p->pHeaderA;
-				for (pp = p->pHeaderA; pp != nullptr && pp->cBegin <= cBegin2; pp = pp->pNext) {
+		HEADER_D* headerVariable = this->structure;
+		for (headerVariable; headerVariable != nullptr && headerVariable->cBegin <= cBegin1; headerVariable = headerVariable->pNext) {
+			if (cBegin1 == headerVariable->cBegin) {
+				HEADER_A* pp, * prevpp = headerVariable->pHeaderA;
+				for (pp = headerVariable->pHeaderA; pp != nullptr && pp->cBegin <= cBegin2; pp = pp->pNext) {
 					if (cBegin2 == pp->cBegin) {
 						ITEM4* ppp, * prevppp = (ITEM4*)pp->pItems;
 						for (ppp = (ITEM4*)pp->pItems; ppp != nullptr; ppp = ppp->pNext) {
@@ -350,7 +349,7 @@ private:
 
 								ITEM4* comp = (ITEM4*)pp->pItems; //first item to compare 
 								if (ppp->pID == comp->pID && ppp->pNext == nullptr) { //only item
-									remove_header_a(prevpp, p, cBegin2);
+									remove_header_a(prevpp, headerVariable, cBegin2);
 								}
 								else if (ppp->pID == comp->pID) { //remove first
 									pp->pItems = ppp->pNext;
@@ -378,13 +377,13 @@ private:
 		cout << "Item " << pID << " doesn't exist" << endl;
 		return;
 	}
-	void remove_header_a(HEADER_A* prevpp, HEADER_D* p, char C) {
-		if (prevpp == p->pHeaderA && prevpp->pNext == nullptr) {// remove header d if only
-			remove_header_d(p);
+	void remove_header_a(HEADER_A* prevpp, HEADER_D* headerVariable, char C) {
+		if (prevpp == headerVariable->pHeaderA && prevpp->pNext == nullptr) {// remove header d if only
+			remove_header_d(headerVariable);
 			delete prevpp;
 		}
-		else if (prevpp == p->pHeaderA && prevpp->cBegin == C) { // remove first
-			p->pHeaderA = prevpp->pNext;
+		else if (prevpp == headerVariable->pHeaderA && prevpp->cBegin == C) { // remove first
+			headerVariable->pHeaderA = prevpp->pNext;
 			delete prevpp;
 		}
 		else {
@@ -395,20 +394,20 @@ private:
 		}
 
 	}
-	void remove_header_d(HEADER_D* p) {
-		if (p == this->structure) { // first item 
-			this->structure = p->pNext;
-			delete p;
+	void remove_header_d(HEADER_D* headerVariable) {
+		if (headerVariable == this->structure) { // first item 
+			this->structure = headerVariable->pNext;
+			delete headerVariable;
 		}
-		else if (p->pNext == nullptr) { //last item
-			p->pPrior->pNext = nullptr;
-			delete p;
+		else if (headerVariable->pNext == nullptr) { //last item
+			headerVariable->pPrior->pNext = nullptr;
+			delete headerVariable;
 		}
 		else {
 			// 
-			p->pPrior->pNext = p->pNext;
-			p->pNext->pPrior = p->pPrior;
-			delete p;
+			headerVariable->pPrior->pNext = headerVariable->pNext;
+			headerVariable->pNext->pPrior = headerVariable->pPrior;
+			delete headerVariable;
 		}
 	}
 };
@@ -416,42 +415,42 @@ private:
 int main()
 {
 	cout << "\033[1;31m[Step 1-3]\033[0m" << endl;
-	DataStructure* pds = new DataStructure;
+	DataStructure* printData = new DataStructure;
 
-	for (int i = 0; i < 10; i++) { *pds += (ITEM4*)GetItem(4); }
+	for (int i = 0; i < 10; i++) { *printData += (ITEM4*)GetItem(4); }
 
-	cout << *pds << endl << endl;
+	cout << *printData << endl << endl;
 
 	cout << "\033[1;31m[Step 4]\033[0m" << endl;
-	cout << "Number of items is: " << pds->GetItemsNumber() << endl << endl;
+	cout << "Number of items is: " << printData->GetItemsNumber() << endl << endl;
 
 	cout << "\033[1;31m[Step 5]\033[0m" << endl;
-	ITEM4* LC = pds->GetItem((char*)"Light Cyan");
+	ITEM4* LC = printData->GetItem((char*)"Light Cyan");
 	cout << LC->pID << ' ' << LC->Code << ' ' << LC->pDate << endl << endl;
 
 	cout << "\033[1;31m[Step 6]\033[0m" << endl;
-	ITEM4* XX = pds->GetItem((char*)"X X");
+	ITEM4* XX = printData->GetItem((char*)"X X");
 	if (XX == NULL) { cout << "Item doesn't exist" << endl << endl; }
 
 	cout << "\033[1;31m[Step 7]\033[0m" << endl;
-	DataStructure* copy = new DataStructure(*pds);
+	DataStructure* copy = new DataStructure(*printData);
 	cout << *copy << endl << endl;
 
 	cout << "\033[1;31m[Step 8]\033[0m" << endl;
-	*pds -= (char*)"Banana Mania";
-	*pds -= (char*)"Persian Green";
-	*pds -= (char*)"Vegas Gold";
-	cout << *pds << endl << endl;
+	*printData -= (char*)"Banana Mania";
+	*printData -= (char*)"Persian Green";
+	*printData -= (char*)"Vegas Gold";
+	cout << *printData << endl << endl;
 
 	cout << "\033[1;31m[Step 9]\033[0m" << endl;
-	cout << (*copy == *pds) << endl;
+	cout << (*copy == *printData) << endl;
 
 	cout << "\033[1;31m[Step 10-11]\033[0m" << endl;
-	pds->Write((char*)"file.txt");
+	printData->Write((char*)"file.txt");
 
 	DataStructure* copy2 = new DataStructure((char*)"file.txt");
 	cout << *copy2 << endl << endl;
-	cout << (*copy2 == *pds) << endl << endl;
+	cout << (*copy2 == *printData) << endl << endl;
 
 	cout << "\033[1;31m[Step 12]\033[0m" << endl;
 	copy2 = copy;
