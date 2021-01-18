@@ -254,19 +254,19 @@ private:
 			}
 		}
 		// does not
-		HEADER_A* ha = new headerA(); //create new header
-		ha->cBegin = cBegin2;
+		HEADER_A* headDV = new headerA(); //create new header
+		headDV->cBegin = cBegin2;
 		if (headerVariable->pHeaderA == nullptr) { //first only
-			ha->pNext = headerVariable->pHeaderA;
-			headerVariable->pHeaderA = ha;
-			add_item(ha, item);
+			headDV->pNext = headerVariable->pHeaderA;
+			headerVariable->pHeaderA = headDV;
+			add_item(headDV, item);
 			return;
 		}
 		else if (cBegin2 < headerVariable->pHeaderA->cBegin) { // just first
 			HEADER_A* temp = headerVariable->pHeaderA;
-			ha->pNext = temp;
-			headerVariable->pHeaderA = ha;
-			add_item(ha, item);
+			headDV->pNext = temp;
+			headerVariable->pHeaderA = headDV;
+			add_item(headDV, item);
 			return;
 		}
 
@@ -274,16 +274,16 @@ private:
 		HEADER_A* prevpp = otheHeaderV;
 		for (otheHeaderV; otheHeaderV != nullptr && cBegin2 > otheHeaderV->cBegin; otheHeaderV = otheHeaderV->pNext) { //add to end
 			if (otheHeaderV->pNext == nullptr) {
-				otheHeaderV->pNext = ha;
-				add_item(ha, item);
+				otheHeaderV->pNext = headDV;
+				add_item(headDV, item);
 				return;
 			}
 			prevpp = otheHeaderV;
 		}
 		// add to middle
-		ha->pNext = otheHeaderV;
-		prevpp->pNext = ha;
-		add_item(ha, item);
+		headDV->pNext = otheHeaderV;
+		prevpp->pNext = headDV;
+		add_item(headDV, item);
 	}
 	void add_item(HEADER_A* otheHeaderV, ITEM4* item) {
 
