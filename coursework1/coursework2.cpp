@@ -89,12 +89,12 @@ public:
 			headerVariable = headerVariable->pNext, op = op->pNext) {
 			if (headerVariable == nullptr || op == nullptr) return 0;
 
-			for (HEADER_A* pp = headerVariable->pHeaderA, *opp = op->pHeaderA;
-				pp || opp;
-				pp = pp->pNext, opp = opp->pNext) {
-				if (pp == nullptr || opp == nullptr) return 0;
+			for (HEADER_A* otheHeaderV = headerVariable->pHeaderA, *opp = op->pHeaderA;
+				otheHeaderV || opp;
+				otheHeaderV = otheHeaderV->pNext, opp = opp->pNext) {
+				if (otheHeaderV == nullptr || opp == nullptr) return 0;
 
-				for (ITEM4* i = (ITEM4*)pp->pItems, *oi = (ITEM4*)opp->pItems;
+				for (ITEM4* i = (ITEM4*)otheHeaderV->pItems, *oi = (ITEM4*)opp->pItems;
 					i || oi;
 					i = i->pNext, oi = oi->pNext) {
 					if (i == nullptr || oi == nullptr) return 0;
@@ -107,12 +107,12 @@ public:
 	}
 
 	void Write(char* pFilename) {
-		if (this->structure == nullptr) { cout << "structure empty"; }
+		if (this->structure == nullptr) { cout << "Structure is missing data. Check the file provided"; }
 		ofstream output;
 		output.open(pFilename);
 		for (HEADER_D* headerVariable = this->structure; headerVariable; headerVariable = headerVariable->pNext) {
-			for (HEADER_A* pp = headerVariable->pHeaderA; pp; pp = pp->pNext) {
-				for (ITEM4* i = (ITEM4*)(pp->pItems); i; i = i->pNext) {
+			for (HEADER_A* otheHeaderV = headerVariable->pHeaderA; otheHeaderV; otheHeaderV = otheHeaderV->pNext) {
+				for (ITEM4* i = (ITEM4*)(otheHeaderV->pItems); i; i = i->pNext) {
 					output << i->pID << ' ' << i->Code << ' ' << i->pDate << endl;
 					output.close();
 				}
@@ -124,8 +124,8 @@ public:
 
 		int n = 1;
 		for (HEADER_D* headerVariable = str.structure; headerVariable; headerVariable = headerVariable->pNext)
-			for (HEADER_A* pp = headerVariable->pHeaderA; pp; pp = pp->pNext)
-				for (ITEM4* i = (ITEM4*)(pp->pItems); i; i = i->pNext, n++)
+			for (HEADER_A* otheHeaderV = headerVariable->pHeaderA; otheHeaderV; otheHeaderV = otheHeaderV->pNext)
+				for (ITEM4* i = (ITEM4*)(otheHeaderV->pItems); i; i = i->pNext, n++)
 					ostr << n << ')' << i->pID << ' ' << i->Code << ' ' << i->pDate << '\n';
 
 		return ostr;
@@ -147,12 +147,12 @@ private:
 
 		delete item;
 	}
-	void delete_header_a(HEADER_A* pp) {
-		if (pp->pNext != nullptr)
-			delete_header_a(pp->pNext);
+	void delete_header_a(HEADER_A* otheHeaderV) {
+		if (otheHeaderV->pNext != nullptr)
+			delete_header_a(otheHeaderV->pNext);
 
-		delete_item((ITEM4*)pp->pItems);
-		delete pp;
+		delete_item((ITEM4*)otheHeaderV->pItems);
+		delete otheHeaderV;
 	}
 	void delete_header_d(HEADER_D* headerVariable) {
 		if (headerVariable->pNext != nullptr)
@@ -177,17 +177,17 @@ private:
 				curp = curpNext;
 			}
 
-			for (HEADER_A* pp = headerVariable->pHeaderA; pp != nullptr; pp = pp->pNext) {
-				curpp->cBegin = pp->cBegin;
+			for (HEADER_A* otheHeaderV = headerVariable->pHeaderA; otheHeaderV != nullptr; otheHeaderV = otheHeaderV->pNext) {
+				curpp->cBegin = otheHeaderV->cBegin;
 				curpp->pItems = new ITEM4();
 				ITEM4* curppp = (ITEM4*)curpp->pItems;
-				if (pp->pNext != nullptr) {
+				if (otheHeaderV->pNext != nullptr) {
 					HEADER_A* curppNext = new headerA();
 					curpp->pNext = curppNext;
 					curpp = curppNext;
 				}
 
-				for (ITEM4* ppp = (ITEM4*)pp->pItems; ppp != nullptr; ppp = ppp->pNext) {
+				for (ITEM4* ppp = (ITEM4*)otheHeaderV->pItems; ppp != nullptr; ppp = ppp->pNext) {
 					// todo strcpy
 					curppp->pID = _strdup(ppp->pID);
 					curppp->Code = ppp->Code;
@@ -247,9 +247,9 @@ private:
 	}
 	void add_header_a(HEADER_D* headerVariable, ITEM4* item) {
 
-		for (HEADER_A* pp = headerVariable->pHeaderA; pp != nullptr && cBegin2 >= pp->cBegin; pp = pp->pNext) {
-			if (cBegin2 == pp->cBegin) {
-				add_item(pp, item);
+		for (HEADER_A* otheHeaderV = headerVariable->pHeaderA; otheHeaderV != nullptr && cBegin2 >= otheHeaderV->cBegin; otheHeaderV = otheHeaderV->pNext) {
+			if (cBegin2 == otheHeaderV->cBegin) {
+				add_item(otheHeaderV, item);
 				return;
 			}
 		}
@@ -270,39 +270,39 @@ private:
 			return;
 		}
 
-		HEADER_A* pp = headerVariable->pHeaderA;
-		HEADER_A* prevpp = pp;
-		for (pp; pp != nullptr && cBegin2 > pp->cBegin; pp = pp->pNext) { //add to end
-			if (pp->pNext == nullptr) {
-				pp->pNext = ha;
+		HEADER_A* otheHeaderV = headerVariable->pHeaderA;
+		HEADER_A* prevpp = otheHeaderV;
+		for (otheHeaderV; otheHeaderV != nullptr && cBegin2 > otheHeaderV->cBegin; otheHeaderV = otheHeaderV->pNext) { //add to end
+			if (otheHeaderV->pNext == nullptr) {
+				otheHeaderV->pNext = ha;
 				add_item(ha, item);
 				return;
 			}
-			prevpp = pp;
+			prevpp = otheHeaderV;
 		}
 		// add to middle
-		ha->pNext = pp;
+		ha->pNext = otheHeaderV;
 		prevpp->pNext = ha;
 		add_item(ha, item);
 	}
-	void add_item(HEADER_A* pp, ITEM4* item) {
+	void add_item(HEADER_A* otheHeaderV, ITEM4* item) {
 
-		for (ITEM4* ppp = (ITEM4*)pp->pItems; ppp != nullptr; ppp = ppp->pNext) {
+		for (ITEM4* ppp = (ITEM4*)otheHeaderV->pItems; ppp != nullptr; ppp = ppp->pNext) {
 			if (!strcmp(ppp->pID, item->pID)) {
 				cout << "Item " << item->pID << " already exists!" << endl;
 				return;
 			}
 		}
 
-		ITEM4* ppp = (ITEM4*)pp->pItems;
+		ITEM4* ppp = (ITEM4*)otheHeaderV->pItems;
 		for (ppp; ppp != nullptr; ppp = ppp->pNext) { // goes to the last item
 			if (ppp->pNext == nullptr) { break; }
 		}
-		if (ppp == nullptr) { pp->pItems = item; }
+		if (ppp == nullptr) { otheHeaderV->pItems = item; }
 		else { ppp->pNext = item; }
 	}
-	bool validate_id(char* pID) {
-		if (pID == nullptr) {
+	bool validate_id(char* pID) { //error codes
+		if (pID == nullptr) { 
 			printf("parameters are empty\n");
 			return false;
 		}
@@ -340,19 +340,19 @@ private:
 		HEADER_D* headerVariable = this->structure;
 		for (headerVariable; headerVariable != nullptr && headerVariable->cBegin <= cBegin1; headerVariable = headerVariable->pNext) {
 			if (cBegin1 == headerVariable->cBegin) {
-				HEADER_A* pp, * prevpp = headerVariable->pHeaderA;
-				for (pp = headerVariable->pHeaderA; pp != nullptr && pp->cBegin <= cBegin2; pp = pp->pNext) {
-					if (cBegin2 == pp->cBegin) {
-						ITEM4* ppp, * prevppp = (ITEM4*)pp->pItems;
-						for (ppp = (ITEM4*)pp->pItems; ppp != nullptr; ppp = ppp->pNext) {
+				HEADER_A* otheHeaderV, * prevpp = headerVariable->pHeaderA;
+				for (otheHeaderV = headerVariable->pHeaderA; otheHeaderV != nullptr && otheHeaderV->cBegin <= cBegin2; otheHeaderV = otheHeaderV->pNext) {
+					if (cBegin2 == otheHeaderV->cBegin) {
+						ITEM4* ppp, * prevppp = (ITEM4*)otheHeaderV->pItems;
+						for (ppp = (ITEM4*)otheHeaderV->pItems; ppp != nullptr; ppp = ppp->pNext) {
 							if (!strcmp(ppp->pID, pID)) {
 
-								ITEM4* comp = (ITEM4*)pp->pItems; //first item to compare 
+								ITEM4* comp = (ITEM4*)otheHeaderV->pItems; //first item to compare 
 								if (ppp->pID == comp->pID && ppp->pNext == nullptr) { //only item
 									remove_header_a(prevpp, headerVariable, cBegin2);
 								}
 								else if (ppp->pID == comp->pID) { //remove first
-									pp->pItems = ppp->pNext;
+									otheHeaderV->pItems = ppp->pNext;
 								}
 								else if (ppp->pNext == nullptr) { //last 
 									prevppp->pNext = nullptr;
@@ -369,7 +369,7 @@ private:
 						}
 					}
 
-					prevpp = pp;
+					prevpp = otheHeaderV;
 				}
 			}
 		}
@@ -378,16 +378,16 @@ private:
 		return;
 	}
 	void remove_header_a(HEADER_A* prevpp, HEADER_D* headerVariable, char C) {
-		if (prevpp == headerVariable->pHeaderA && prevpp->pNext == nullptr) {// remove header d if only
+		if (prevpp == headerVariable->pHeaderA && prevpp->pNext == nullptr) {// removing HEADER_D entirely if there is no previous variable
 			remove_header_d(headerVariable);
 			delete prevpp;
 		}
-		else if (prevpp == headerVariable->pHeaderA && prevpp->cBegin == C) { // remove first
+		else if (prevpp == headerVariable->pHeaderA && prevpp->cBegin == C) { // remove first line
 			headerVariable->pHeaderA = prevpp->pNext;
 			delete prevpp;
 		}
 		else {
-			// remove any other item 
+			// remove anything other than those two conditions above
 			HEADER_A* remove = prevpp->pNext;
 			prevpp->pNext = remove->pNext;
 			delete remove;
@@ -395,16 +395,16 @@ private:
 
 	}
 	void remove_header_d(HEADER_D* headerVariable) {
-		if (headerVariable == this->structure) { // first item 
+		if (headerVariable == this->structure) { // first line 
 			this->structure = headerVariable->pNext;
 			delete headerVariable;
 		}
-		else if (headerVariable->pNext == nullptr) { //last item
+		else if (headerVariable->pNext == nullptr) { //last line
 			headerVariable->pPrior->pNext = nullptr;
 			delete headerVariable;
 		}
 		else {
-			// 
+			// middle
 			headerVariable->pPrior->pNext = headerVariable->pNext;
 			headerVariable->pNext->pPrior = headerVariable->pPrior;
 			delete headerVariable;
