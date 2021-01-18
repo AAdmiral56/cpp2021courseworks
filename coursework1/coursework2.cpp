@@ -28,7 +28,7 @@ public:
 				fID = fID + ' ' + lID;
 
 				ITEM4* item = new ITEM4();
-				item->pID = _strdup((char*)fID.c_str());
+				item->pID = _strdup((char*)fID.c_str()); //dupplicating
 				item->Code = code;
 				item->pDate = _strdup((char*)date.c_str());
 
@@ -63,10 +63,10 @@ public:
 		find_IDs(pID);
 		for (HEADER_D* headerVariable = this->structure; headerVariable != nullptr && cBegin1 >= headerVariable->cBegin; headerVariable = headerVariable->pNext) //items are inserted as long as headerVariable is present in struct, is not null and cBegin1 is more than the original (cBegin1 is the cBegin that will be usd to insert variables on a loop)
 			if (headerVariable->cBegin == cBegin1)
-				for (HEADER_A* pp = headerVariable->pHeaderA; pp != nullptr && cBegin2 >= pp->cBegin; pp = pp->pNext)
-					if (pp->cBegin == cBegin2)
-						for (ITEM4* ppp = (ITEM4*)pp->pItems; ppp != nullptr; ppp = ppp->pNext)
-							if (!strcmp(ppp->pID, pID)) return ppp;
+				for (HEADER_A* otheHeaderV = headerVariable->pHeaderA; otheHeaderV != nullptr && cBegin2 >= otheHeaderV->cBegin; otheHeaderV = otheHeaderV->pNext)
+					if (otheHeaderV->cBegin == cBegin2)
+						for (ITEM4* otheHeaderVar3 = (ITEM4*)otheHeaderV->pItems; otheHeaderVar3 != nullptr; otheHeaderVar3 = otheHeaderVar3->pNext)
+							if (!strcmp(otheHeaderVar3->pID, pID)) return otheHeaderVar3;
 
 		return NULL;
 	}
@@ -187,12 +187,12 @@ private:
 					curpp = curppNext;
 				}
 
-				for (ITEM4* ppp = (ITEM4*)otheHeaderV->pItems; ppp != nullptr; ppp = ppp->pNext) {
+				for (ITEM4* otheHeaderVar3 = (ITEM4*)otheHeaderV->pItems; otheHeaderVar3 != nullptr; otheHeaderVar3 = otheHeaderVar3->pNext) {
 					// todo strcpy
-					curppp->pID = _strdup(ppp->pID);
-					curppp->Code = ppp->Code;
-					curppp->pDate = ppp->pDate;
-					if (ppp->pNext != nullptr) {
+					curppp->pID = _strdup(otheHeaderVar3->pID);
+					curppp->Code = otheHeaderVar3->Code;
+					curppp->pDate = otheHeaderVar3->pDate;
+					if (otheHeaderVar3->pNext != nullptr) {
 						ITEM4* curpppNext = new ITEM4();
 						curppp->pNext = curpppNext;
 						curppp = curpppNext;
@@ -287,19 +287,19 @@ private:
 	}
 	void add_item(HEADER_A* otheHeaderV, ITEM4* item) {
 
-		for (ITEM4* ppp = (ITEM4*)otheHeaderV->pItems; ppp != nullptr; ppp = ppp->pNext) {
-			if (!strcmp(ppp->pID, item->pID)) {
+		for (ITEM4* otheHeaderVar3 = (ITEM4*)otheHeaderV->pItems; otheHeaderVar3 != nullptr; otheHeaderVar3 = otheHeaderVar3->pNext) {
+			if (!strcmp(otheHeaderVar3->pID, item->pID)) {
 				cout << "Item " << item->pID << " already exists!" << endl;
 				return;
 			}
 		}
 
-		ITEM4* ppp = (ITEM4*)otheHeaderV->pItems;
-		for (ppp; ppp != nullptr; ppp = ppp->pNext) { // goes to the last item
-			if (ppp->pNext == nullptr) { break; }
+		ITEM4* otheHeaderVar3 = (ITEM4*)otheHeaderV->pItems;
+		for (otheHeaderVar3; otheHeaderVar3 != nullptr; otheHeaderVar3 = otheHeaderVar3->pNext) { // goes to the last item
+			if (otheHeaderVar3->pNext == nullptr) { break; }
 		}
-		if (ppp == nullptr) { otheHeaderV->pItems = item; }
-		else { ppp->pNext = item; }
+		if (otheHeaderVar3 == nullptr) { otheHeaderV->pItems = item; }
+		else { otheHeaderVar3->pNext = item; }
 	}
 	bool validate_id(char* pID) { //error codes
 		if (pID == nullptr) { 
@@ -343,29 +343,29 @@ private:
 				HEADER_A* otheHeaderV, * prevpp = headerVariable->pHeaderA;
 				for (otheHeaderV = headerVariable->pHeaderA; otheHeaderV != nullptr && otheHeaderV->cBegin <= cBegin2; otheHeaderV = otheHeaderV->pNext) {
 					if (cBegin2 == otheHeaderV->cBegin) {
-						ITEM4* ppp, * prevppp = (ITEM4*)otheHeaderV->pItems;
-						for (ppp = (ITEM4*)otheHeaderV->pItems; ppp != nullptr; ppp = ppp->pNext) {
-							if (!strcmp(ppp->pID, pID)) {
+						ITEM4* otheHeaderVar3, * prevppp = (ITEM4*)otheHeaderV->pItems;
+						for (otheHeaderVar3 = (ITEM4*)otheHeaderV->pItems; otheHeaderVar3 != nullptr; otheHeaderVar3 = otheHeaderVar3->pNext) {
+							if (!strcmp(otheHeaderVar3->pID, pID)) {
 
 								ITEM4* comp = (ITEM4*)otheHeaderV->pItems; //first item to compare 
-								if (ppp->pID == comp->pID && ppp->pNext == nullptr) { //only item
+								if (otheHeaderVar3->pID == comp->pID && otheHeaderVar3->pNext == nullptr) { //only item
 									remove_header_a(prevpp, headerVariable, cBegin2);
 								}
-								else if (ppp->pID == comp->pID) { //remove first
-									otheHeaderV->pItems = ppp->pNext;
+								else if (otheHeaderVar3->pID == comp->pID) { //remove first
+									otheHeaderV->pItems = otheHeaderVar3->pNext;
 								}
-								else if (ppp->pNext == nullptr) { //last 
+								else if (otheHeaderVar3->pNext == nullptr) { //last 
 									prevppp->pNext = nullptr;
 								}
 								else {
-									prevppp->pNext = ppp->pNext;
+									prevppp->pNext = otheHeaderVar3->pNext;
 								}
-								delete ppp->pID;
-								delete ppp;
+								delete otheHeaderVar3->pID;
+								delete otheHeaderVar3;
 								return;
 							}
 
-							prevppp = ppp;
+							prevppp = otheHeaderVar3;
 						}
 					}
 
