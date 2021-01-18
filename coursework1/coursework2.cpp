@@ -214,36 +214,36 @@ private:
 			}
 		}
 		// does not
-		HEADER_D* hd = new headerD();
-		hd->cBegin = cBegin1;
+		HEADER_D* headDV = new headerD();
+		headDV->cBegin = cBegin1;
 		if (this->structure == nullptr) { //first only
-			hd->pNext = this->structure;
-			this->structure = hd;
-			add_header_a(hd, item);
+			headDV->pNext = this->structure;
+			this->structure = headDV;
+			add_header_a(headDV, item);
 			return;
 		}
 		else if (cBegin1 < this->structure->cBegin) { // just first
-			hd->pNext = this->structure;
-			this->structure->pPrior = hd;
-			this->structure = hd;
-			add_header_a(hd, item);
+			headDV->pNext = this->structure;
+			this->structure->pPrior = headDV;
+			this->structure = headDV;
+			add_header_a(headDV, item);
 			return;
 		}
 
 		HEADER_D* headerVariable = this->structure;
 		for (headerVariable; headerVariable != nullptr && cBegin1 > headerVariable->cBegin; headerVariable = headerVariable->pNext) { // if item in last
 			if (headerVariable->pNext == nullptr) {
-				hd->pPrior = headerVariable;
-				headerVariable->pNext = hd;
-				add_header_a(hd, item);
+				headDV->pPrior = headerVariable;
+				headerVariable->pNext = headDV;
+				add_header_a(headDV, item);
 				return;
 			}
 		}
-		hd->pPrior = headerVariable->pPrior;
-		hd->pNext = headerVariable;
-		headerVariable->pPrior->pNext = hd;
-		headerVariable->pPrior = hd;
-		add_header_a(hd, item);
+		headDV->pPrior = headerVariable->pPrior;
+		headDV->pNext = headerVariable;
+		headerVariable->pPrior->pNext = headDV;
+		headerVariable->pPrior = headDV;
+		add_header_a(headDV, item);
 	}
 	void add_header_a(HEADER_D* headerVariable, ITEM4* item) {
 
