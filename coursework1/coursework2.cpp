@@ -19,9 +19,9 @@ public:
 		else {
 
 			ifstream input;
-			input.open(pFilename);
+			input.open(pFilename); //opening file
 
-			string fID, lID, date;
+			string fID, lID, date; //gettign the file data 
 			unsigned long int code;
 
 			while (input >> fID >> lID >> code >> date) {
@@ -40,7 +40,7 @@ public:
 	}
 
 	~DataStructure() { delete_header_d(this->structure); }
-
+//function call
 	DataStructure(const DataStructure& Original) { copy_dataStructure(Original.structure); }
 
 	int GetItemsNumber() {
@@ -61,7 +61,7 @@ public:
 	ITEM4* GetItem(char* pID) {
 		if (pID == nullptr) { return NULL; }
 		find_IDs(pID);
-		for (HEADER_D* headerVariable = this->structure; headerVariable != nullptr && cBegin1 >= headerVariable->cBegin; headerVariable = headerVariable->pNext)
+		for (HEADER_D* headerVariable = this->structure; headerVariable != nullptr && cBegin1 >= headerVariable->cBegin; headerVariable = headerVariable->pNext) //items are inserted as long as headerVariable is present in struct, is not null and cBegin1 is more than the original (cBegin1 is the cBegin that will be usd to insert variables on a loop)
 			if (headerVariable->cBegin == cBegin1)
 				for (HEADER_A* pp = headerVariable->pHeaderA; pp != nullptr && cBegin2 >= pp->cBegin; pp = pp->pNext)
 					if (pp->cBegin == cBegin2)
@@ -75,10 +75,7 @@ public:
 
 	void operator-=(char* pID) { remove_item(pID); }
 
-	DataStructure& operator=(const DataStructure& Right) {
-		delete_header_d(this->structure);
-		copy_dataStructure(Right.structure);
-	}
+	DataStructure& operator=(const DataStructure& Right) { delete_header_d(this->structure); copy_dataStructure(Right.structure);}
 
 	int operator==(DataStructure& Other) {
 
@@ -86,7 +83,7 @@ public:
 			return 0;
 		else if (this->structure == nullptr && Other.structure != nullptr)
 			return 0;
-		//goes though double loop for header D then A and then item if number of entities is different they are not equal
+		//loops through both headers and determines if the number of entities is equal or not
 		for (HEADER_D* headerVariable = this->structure, *op = Other.structure;
 			headerVariable != nullptr && op != nullptr;
 			headerVariable = headerVariable->pNext, op = op->pNext) {
@@ -113,11 +110,14 @@ public:
 		if (this->structure == nullptr) { cout << "structure empty"; }
 		ofstream output;
 		output.open(pFilename);
-		for (HEADER_D* headerVariable = this->structure; headerVariable; headerVariable = headerVariable->pNext)
-			for (HEADER_A* pp = headerVariable->pHeaderA; pp; pp = pp->pNext)
-				for (ITEM4* i = (ITEM4*)(pp->pItems); i; i = i->pNext)
+		for (HEADER_D* headerVariable = this->structure; headerVariable; headerVariable = headerVariable->pNext) {
+			for (HEADER_A* pp = headerVariable->pHeaderA; pp; pp = pp->pNext) {
+				for (ITEM4* i = (ITEM4*)(pp->pItems); i; i = i->pNext) {
 					output << i->pID << ' ' << i->Code << ' ' << i->pDate << endl;
-		output.close();
+					output.close();
+				}
+			}
+		}
 	}
 
 	friend ostream& operator<<(ostream& ostr, const DataStructure& str) {
@@ -414,45 +414,45 @@ private:
 
 int main()
 {
-	cout << "\033[1;31m[Step 1-3]\033[0m" << endl;
+	system("Color 1A");
+	cout << "----------[Step 1-3]----------" << endl;
 	DataStructure* printData = new DataStructure;
-
-	for (int i = 0; i < 10; i++) { *printData += (ITEM4*)GetItem(4); }
+    for (int i = 0; i < 10; i++) { *printData += (ITEM4*)GetItem(4); }
 
 	cout << *printData << endl << endl;
 
-	cout << "\033[1;31m[Step 4]\033[0m" << endl;
+	cout << "----------[Step 4]----------" << endl;
 	cout << "Number of items is: " << printData->GetItemsNumber() << endl << endl;
 
-	cout << "\033[1;31m[Step 5]\033[0m" << endl;
+	cout << "----------[Step 5]----------" << endl;
 	ITEM4* LC = printData->GetItem((char*)"Light Cyan");
 	cout << LC->pID << ' ' << LC->Code << ' ' << LC->pDate << endl << endl;
 
-	cout << "\033[1;31m[Step 6]\033[0m" << endl;
+	cout << "----------[Step 6]----------" << endl;
 	ITEM4* XX = printData->GetItem((char*)"X X");
 	if (XX == NULL) { cout << "Item doesn't exist" << endl << endl; }
 
-	cout << "\033[1;31m[Step 7]\033[0m" << endl;
+	cout << "----------[Step 7]----------" << endl;
 	DataStructure* copy = new DataStructure(*printData);
 	cout << *copy << endl << endl;
 
-	cout << "\033[1;31m[Step 8]\033[0m" << endl;
+	cout << "----------[Step 8]----------" << endl;
 	*printData -= (char*)"Banana Mania";
 	*printData -= (char*)"Persian Green";
 	*printData -= (char*)"Vegas Gold";
 	cout << *printData << endl << endl;
 
-	cout << "\033[1;31m[Step 9]\033[0m" << endl;
+	cout << "----------[Step 9]----------" << endl;
 	cout << (*copy == *printData) << endl;
 
-	cout << "\033[1;31m[Step 10-11]\033[0m" << endl;
+	cout << "----------[Step 10-11]----------" << endl;
 	printData->Write((char*)"file.txt");
 
 	DataStructure* copy2 = new DataStructure((char*)"file.txt");
 	cout << *copy2 << endl << endl;
 	cout << (*copy2 == *printData) << endl << endl;
 
-	cout << "\033[1;31m[Step 12]\033[0m" << endl;
+	cout << "----------[Step 12]----------" << endl;
 	copy2 = copy;
 	cout << *copy2 << endl << endl;
 
