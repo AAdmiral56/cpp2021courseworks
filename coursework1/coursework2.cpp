@@ -163,39 +163,39 @@ private:
 	}
 	void copy_dataStructure(HEADER_D* Original) {
 		this->structure = new headerD();
-		HEADER_D* curPrev = nullptr;
-		HEADER_D* curp = this->structure;
+		HEADER_D* prevLine = nullptr;
+		HEADER_D* recursiveVar = this->structure;
 		for (HEADER_D* headerVariable = Original; headerVariable != nullptr; headerVariable = headerVariable->pNext) {
-			curp->pPrior = curPrev;
-			curPrev = curp;
-			curp->cBegin = headerVariable->cBegin;
-			curp->pHeaderA = new headerA();
-			HEADER_A* curpp = curp->pHeaderA;
+			recursiveVar->pPrior = prevLine;
+			prevLine = recursiveVar;
+			recursiveVar->cBegin = headerVariable->cBegin;
+			recursiveVar->pHeaderA = new headerA();
+			HEADER_A* recursiveVar2 = recursiveVar->pHeaderA;
 			if (headerVariable->pNext != nullptr) {
-				HEADER_D* curpNext = new headerD();
-				curp->pNext = curpNext;
-				curp = curpNext;
+				HEADER_D* nextLine = new headerD();
+				recursiveVar->pNext = nextLine;
+				recursiveVar = nextLine;
 			}
 
 			for (HEADER_A* otheHeaderV = headerVariable->pHeaderA; otheHeaderV != nullptr; otheHeaderV = otheHeaderV->pNext) {
-				curpp->cBegin = otheHeaderV->cBegin;
-				curpp->pItems = new ITEM4();
-				ITEM4* curppp = (ITEM4*)curpp->pItems;
+				recursiveVar2->cBegin = otheHeaderV->cBegin;
+				recursiveVar2->pItems = new ITEM4();
+				ITEM4* recursiveVar3 = (ITEM4*)recursiveVar2->pItems;
 				if (otheHeaderV->pNext != nullptr) {
-					HEADER_A* curppNext = new headerA();
-					curpp->pNext = curppNext;
-					curpp = curppNext;
+					HEADER_A* nextLine2 = new headerA();
+					recursiveVar2->pNext = nextLine2;
+					recursiveVar2 = nextLine2;
 				}
 
 				for (ITEM4* otheHeaderVar3 = (ITEM4*)otheHeaderV->pItems; otheHeaderVar3 != nullptr; otheHeaderVar3 = otheHeaderVar3->pNext) {
 					// todo strcpy
-					curppp->pID = _strdup(otheHeaderVar3->pID);
-					curppp->Code = otheHeaderVar3->Code;
-					curppp->pDate = otheHeaderVar3->pDate;
+					recursiveVar3->pID = _strdup(otheHeaderVar3->pID);
+					recursiveVar3->Code = otheHeaderVar3->Code;
+					recursiveVar3->pDate = otheHeaderVar3->pDate;
 					if (otheHeaderVar3->pNext != nullptr) {
-						ITEM4* curpppNext = new ITEM4();
-						curppp->pNext = curpppNext;
-						curppp = curpppNext;
+						ITEM4* nextLine3 = new ITEM4();
+						recursiveVar3->pNext = nextLine3;
+						recursiveVar3 = nextLine3;
 					}
 				}
 			}
