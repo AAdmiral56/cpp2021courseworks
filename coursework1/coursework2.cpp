@@ -48,11 +48,11 @@ public:
 		HEADER_D* headerVariable; // auxiliary variable
 		for (headerVariable = this->structure; headerVariable; headerVariable = headerVariable->pNext) {
 
-			HEADER_A* pp;
-			for (pp = headerVariable->pHeaderA; pp; pp = pp->pNext) {
+			HEADER_A* otheHeaderV;
+			for (otheHeaderV = headerVariable->pHeaderA; otheHeaderV; otheHeaderV = otheHeaderV->pNext) {
 
 				ITEM4* i;
-				for (i = (ITEM4*)(pp->pItems); i; i = i->pNext, n++);
+				for (i = (ITEM4*)(otheHeaderV->pItems); i; i = i->pNext, n++);
 			}
 		}
 		return n;
